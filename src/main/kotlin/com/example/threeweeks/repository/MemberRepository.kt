@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface MemberRepository:JpaRepository<Member,String> {
-    fun findByUserid(userid:String):Member?
+    fun findByUserid(userid:String):Member
 }

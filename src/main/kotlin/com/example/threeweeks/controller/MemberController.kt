@@ -9,6 +9,8 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -23,29 +25,19 @@ import java.util.*
 
 class MemberController(private val memberService: MemberService) {
     @PostMapping("/register")
-    fun register(@RequestBody memberDto: MemberDto): ResponseEntity<Member>{
+    fun register(@RequestBody memberDto: MemberDto): ResponseEntity<Member> {
 
-//        val user=MemberDto(memberDto.name,memberDto.userid,memberDto.password)//설명시급
 
         return ResponseEntity.ok(this.memberService.register(memberDto))
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody loginDto: LoginDto): ResponseEntity<Any>{
-        val member= this.memberService.findByUserId(loginDto.userid) ?: return ResponseEntity.badRequest().body(Message("user not found!"))
+    fun login(@RequestBody memberDto: MemberDto):ResponseEntity<String>{
+        return ResponseEntity.ok(this.memberService.signin(memberDto))
 
-
-        if(!member.comparePassword(loginDto.password)){
-            return ResponseEntity.badRequest().body(Message("invalid password!"))
-        }
-
-        val secretKey = "codingistooharduihhuihuihuihiuhuihuihuihuihuihuihuihuibjbhgyugg"
-        val issuer=member.userid
-        val key: Key = Keys.hmacShaKeyFor(secretKey.toByteArray(StandardCharsets.UTF_8))
-        val jwt= Jwts.builder()
-            .setIssuer(issuer)
-            .setExpiration(Date(System.currentTimeMillis()+60 * 24 * 1000)) //1 day
-            .signWith(key, SignatureAlgorithm.HS256).compact()
-        return ResponseEntity.ok(jwt)
+    }
+    @GetMapping("/test")
+    fun test(@ModelAttribute("userId") userId:String): String {
+        return userId
     }
 }
